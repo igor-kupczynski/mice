@@ -63,6 +63,8 @@ New content front matter:
 ---
 tags: [privatelink, network]
 date: 2022-01-30
+from:
+    - 2022/01/30/private-link.html
 ---
 # Private Link is the IP filtering of the cloud
 
@@ -73,7 +75,8 @@ Transformations to front matter
 - [ ] Drop `layout`
 - [ ] Drop `title` (but add it to content)
 - [ ] Drop `tagline` (but add it to content)
-- [ ] Add `date` (based on the prev file name)
+- [ ] Add `date` based on the prev file name
+- [ ] Add `from` based on the url scheme of my blog
 
 
 ## Markdown content
@@ -82,3 +85,8 @@ Transformations to file content:
 - [ ] Add title in the first line
 - [ ] Add tagline after the first line
 - [ ] Rewrite image urls
+
+
+## Validation
+- [ ] Eyeball top 10 pages
+- [ ] Compare jekyll output to `from` property in the front matter
