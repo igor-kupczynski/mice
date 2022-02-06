@@ -1,21 +1,27 @@
 package main
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
-	"time"
 )
 
 func main() {
 	from := flag.String("from", "", "where to migrate the content from")
+	to := flag.String("to", "", "where to migrate the content to")
 	flag.Parse()
 
 	if *from == "" {
 		log.Fatalf("-from is required")
+	}
+	if *to == "" {
+		log.Fatalf("-to is required")
 	}
 
 	posts, err := ReadContentFromDir(filepath.Join(*from, "_posts"))
@@ -27,8 +33,10 @@ func main() {
 		log.Fatalf("Can't read images from the source dir: %v\n", err)
 	}
 	cts := append(posts, imgs...)
-	for i, ct := range cts {
-		log.Printf("%03d: %10s, %s, %s\n", i, ct.DatePrefix, ct.Title, ct.Extension)
+
+	err = SaveContentToDir(*to, cts)
+	if err != nil {
+		log.Fatalf("Can't write the content to target: %v\n", err)
 	}
 }
 
@@ -73,6 +81,28 @@ func splitFname(fname string) (datePrefix string, title string, ext string) {
 	return
 }
 
+func SaveContentToDir(path string, cts []*ContentFile) error {
+	// target path must not exist, as a fail-safe not to overwrite anything
+	err := os.Mkdir(path, 0755)
+	if err != nil && errors.Is(err, os.ErrExist) {
+		log.Printf("The target directory '%s' exists, its content maybe overwritten\n", path)
+	}
+	if err != nil && !errors.Is(err, os.ErrExist) {
+		return err
+	}
+	for _, ct := range cts {
+		// try creating the year directory, ignore errors because the directory might have been created already
+		yearDir := filepath.Join(path, ct.Year())
+		_ = os.Mkdir(yearDir, 0755)
+
+		ctPath := filepath.Join(yearDir, ct.NewFname())
+		if err := os.WriteFile(ctPath, ct.Content, 0644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ContentFile represents a file on disk, a piece of content to be moved/transformed.
 type ContentFile struct {
 	Title      string
@@ -81,10 +111,11 @@ type ContentFile struct {
 	Content    []byte
 }
 
-// Post is a text markdown post
-type Post struct {
-	ContentFile
-	CreationDate time.Time
-	Tags         []string
-	Tagline      string
+// Year returns the year when this ContentFile was created
+func (c *ContentFile) Year() string {
+	return c.DatePrefix[:4]
+}
+
+func (c *ContentFile) NewFname() string {
+	return fmt.Sprintf("%s.%s", c.Title, c.Extension)
 }

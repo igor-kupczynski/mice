@@ -41,8 +41,8 @@ New content structure:
 ```
 
 Transformations to file system structure:
-- [ ] Put all content under a year (drop the _post / static distinction)
-- [ ] Drop date from file name
+- [X] Put all content under a year (drop the _post / static distinction)
+- [X] Drop date from file name
 - [ ] Put some content under /archive, depending on a front matter setting
 
 
