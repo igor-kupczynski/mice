@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -10,6 +11,10 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
+
+	"github.com/adrg/frontmatter"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -54,18 +59,79 @@ func ReadContentFromDir(path string) ([]*ContentFile, error) {
 			return err
 		}
 		datePrefix, title, ext := splitFname(filepath.Base(path))
-		contents = append(contents, &ContentFile{
+		content := &ContentFile{
 			Title:      title,
 			DatePrefix: datePrefix,
 			Extension:  ext,
 			Content:    buf,
-		})
+
+			Post: nil,
+		}
+		contents = append(contents, content)
+
+		if content.Extension != "md" {
+			return nil
+		}
+
+		// post specific transformations
+		post, err := processPost(content.Title, content.DatePrefix, content.Content)
+		content.Post = post
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
 	return contents, nil
+}
+
+func processPost(fname string, created string, content []byte) (*Post, error) {
+	var fromMatter struct {
+		Title   string   `yaml:"title"`
+		Tags    []string `yaml:"tags"`
+		Tagline string   `yaml:"tagline"`
+	}
+	rest, err := frontmatter.Parse(bytes.NewReader(content), &fromMatter)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := make([]byte, 0)
+
+	from := fmt.Sprintf("%s/%s.html", strings.ReplaceAll(created, "-", "/"), fname)
+
+	toMatter := &struct {
+		Tags    []string `yaml:"tags"`
+		Created string   `yaml:"created"`
+		From    []string `yaml:"from"`
+	}{
+		Tags:    fromMatter.Tags,
+		Created: created,
+		From:    []string{from},
+	}
+	matterBuf, err := yaml.Marshal(toMatter)
+	if err != nil {
+		return nil, err
+	}
+
+	// start with front matter
+	buf = append(buf, []byte(fmt.Sprintf("---\n"))...)
+	buf = append(buf, matterBuf...)
+	buf = append(buf, []byte(fmt.Sprintf("---\n"))...)
+
+	// add title
+	buf = append(buf, []byte(fmt.Sprintf("# %s\n", fromMatter.Title))...)
+
+	if fromMatter.Tagline != "" {
+		// add tagline
+		buf = append(buf, []byte(fmt.Sprintf("\n%s\n", fromMatter.Tagline))...)
+	}
+
+	buf = append(buf, rest...)
+
+	p := &Post{
+		Content: buf,
+	}
+	return p, nil
 }
 
 var fnameRegexp = regexp.MustCompile(`^([0-9]{4}-[0-9]{2}(-[0-9]{2})?)-([0-9A-z-]+)`)
@@ -96,7 +162,11 @@ func SaveContentToDir(path string, cts []*ContentFile) error {
 		_ = os.Mkdir(yearDir, 0755)
 
 		ctPath := filepath.Join(yearDir, ct.NewFname())
-		if err := os.WriteFile(ctPath, ct.Content, 0644); err != nil {
+		content := ct.Content
+		if ct.Post != nil {
+			content = ct.Post.Content
+		}
+		if err := os.WriteFile(ctPath, content, 0644); err != nil {
 			return err
 		}
 	}
@@ -109,6 +179,7 @@ type ContentFile struct {
 	DatePrefix string
 	Extension  string
 	Content    []byte
+	Post       *Post
 }
 
 // Year returns the year when this ContentFile was created
@@ -118,4 +189,9 @@ func (c *ContentFile) Year() string {
 
 func (c *ContentFile) NewFname() string {
 	return fmt.Sprintf("%s.%s", c.Title, c.Extension)
+}
+
+// Post represents the extra fields for the layout: _post content
+type Post struct {
+	Content []byte
 }

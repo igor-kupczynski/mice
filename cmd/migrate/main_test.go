@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 type fnameExample struct {
 	fname      string
@@ -30,6 +33,65 @@ func Test_splitFname(t *testing.T) {
 			}
 			if gotExt != tt.ext {
 				t.Errorf("splitFname().ext = %v, want %v", gotExt, tt.ext)
+			}
+		})
+	}
+}
+
+func Test_processPost(t *testing.T) {
+	type args struct {
+		fname   string
+		created string
+		content []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Post
+		wantErr bool
+	}{
+		{
+			name: "Should process front matter and content",
+			args: args{
+				fname:   "private-link",
+				created: "2022-01-30",
+				content: []byte(`---
+layout: post
+title: "Private Link is the IP filtering of the cloud"
+tags: [privatelink, network]
+tagline: Use cases for Private Link and differences in its implementation across the major Cloud Providers.
+---
+
+foo
+`),
+			},
+			want: &Post{
+				Content: []byte(`---
+tags:
+- privatelink
+- network
+created: "2022-01-30"
+from:
+- 2022/01/30/private-link.html
+---
+# Private Link is the IP filtering of the cloud
+
+Use cases for Private Link and differences in its implementation across the major Cloud Providers.
+
+foo
+`),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := processPost(tt.args.fname, tt.args.created, tt.args.content)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("processPost() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got.Content, tt.want.Content) {
+				t.Errorf("processPost().Content got = %v, want %v", string(got.Content), string(tt.want.Content))
 			}
 		})
 	}

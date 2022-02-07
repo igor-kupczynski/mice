@@ -61,10 +61,12 @@ tagline: Use cases for Private Link and differences in its implementation across
 New content front matter:
 ```
 ---
-tags: [privatelink, network]
-date: 2022-01-30
+tags:
+- privatelink
+- network
+created: 2022-01-30
 from:
-    - 2022/01/30/private-link.html
+- 2022/01/30/private-link.html
 ---
 # Private Link is the IP filtering of the cloud
 
@@ -72,18 +74,18 @@ Use cases for Private Link and differences in its implementation across the majo
 ```
 
 Transformations to front matter
-- [ ] Drop `layout`
-- [ ] Drop `title` (but add it to content)
-- [ ] Drop `tagline` (but add it to content)
-- [ ] Add `date` based on the prev file name
-- [ ] Add `from` based on the url scheme of my blog
+- [X] Drop `layout`
+- [X] Drop `title` (but add it to content)
+- [X] Drop `tagline` (but add it to content)
+- [X] Add `date` based on the prev file name
+- [X] Add `from` based on the url scheme of my blog
 
 
 ## Markdown content
 
 Transformations to file content:
-- [ ] Add title in the first line
-- [ ] Add tagline after the first line
+- [X] Add title in the first line
+- [X] Add tagline after the first line
 - [ ] Rewrite image urls
 
 
