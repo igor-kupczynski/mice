@@ -71,7 +71,7 @@ tags:
 - privatelink
 - network
 created: "2022-01-30"
-from:
+redirect_from:
 - 2022/01/30/private-link.html
 ---
 # Private Link is the IP filtering of the cloud
