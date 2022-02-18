@@ -101,11 +101,11 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 
 	toMatter := &struct {
 		Tags         []string `yaml:"tags"`
-		Created      string   `yaml:"created"`
+		Date         string   `yaml:"date"`
 		RedirectFrom []string `yaml:"redirect_from"`
 	}{
 		Tags:         fromMatter.Tags,
-		Created:      created,
+		Date:         created,
 		RedirectFrom: []string{from},
 	}
 	matterBuf, err := yaml.Marshal(toMatter)
@@ -157,7 +157,7 @@ func SaveContentToDir(path string, cts []*ContentFile) error {
 		return err
 	}
 	for _, ct := range cts {
-		// try creating the year directory, ignore errors because the directory might have been created already
+		// try creating the year directory, ignore errors because the directory might have been date already
 		yearDir := filepath.Join(path, ct.Year())
 		_ = os.Mkdir(yearDir, 0755)
 
@@ -182,7 +182,7 @@ type ContentFile struct {
 	Post       *Post
 }
 
-// Year returns the year when this ContentFile was created
+// Year returns the year when this ContentFile was date
 func (c *ContentFile) Year() string {
 	return c.DatePrefix[:4]
 }
