@@ -1,12 +1,12 @@
-# Migrate
+# Migrate Geek Igor
 
-`migrate` is a helper tool to _migrate_ my old jekyll based blog + content to new structure.
+`migrate_geek_igor` is a helper tool to _migrate_ my old jekyll based blog + content to new structure.
 
 It is intended as a single use tool.
 
 Usage:
 ```src
-migrate -from ~/jekyll_blog  -to ./content
+migrate_geek_igor -from ~/jekyll_blog  -to ./content
 ```
 
 ## Content structure
@@ -18,12 +18,12 @@ Old content structure:
 │   ├── 2013-03-22-meta-blogging-jekyll-setup.md
 │   └── 2022-01-30-private-link.md
 └── static
-└── img
-└── posts
-├── 2022-01-ip-filtering.png
-├── 2022-01-private-link-basic.png
-├── 2022-01-private-link.png
-└── 2022-01-vpc-peering.png
+    └── img
+    └── posts
+        ├── 2022-01-ip-filtering.png
+        ├── 2022-01-private-link-basic.png
+        ├── 2022-01-private-link.png
+        └── 2022-01-vpc-peering.png
 ```
 
 New content structure:

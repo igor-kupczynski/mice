@@ -1,6 +1,6 @@
-module mice
+module migrate_geek_igor
 
-go 1.17
+go 1.18
 
 require github.com/adrg/frontmatter v0.2.0
 
