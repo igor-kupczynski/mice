@@ -29,21 +29,15 @@ Old content structure:
 New content structure:
 ```
 .
-├── 2022
-│   ├── private-link.md
-│   ├── ip-filtering.png
-│   ├── ip-filtering-basic.png
-│   ├── private-link.png
-│   └── vpc-peering.png
-└── archive
-└── 2013
-└── meta-blogging-jekyll-setup.md
+├── _posts
+│   └── 2022-01-30-private-link.md
+├── _assets
+│   ├── 2022-01-ip-filtering.png
+│   ├── 2022-01-ip-filtering-basic.png
+│   ├── 2022-01-private-link.png
+│   └── 2022-01-vpc-peering.png
+(...)
 ```
-
-Transformations to file system structure:
-- [X] Put all content under a year (drop the _post / static distinction)
-- [X] Drop date from file name
-- ~~Put some content under /archive, depending on a front matter setting~~ (drop: we can do that manually if need be)
 
 
 ## Front matter
@@ -64,7 +58,6 @@ New content front matter:
 tags:
 - privatelink
 - network
-created: 2022-01-30
 redirect_from:
 - 2022/01/30/private-link.html
 ---
@@ -73,17 +66,7 @@ redirect_from:
 Use cases for Private Link and differences in its implementation across the major Cloud Providers.
 ```
 
-Transformations to front matter
-- [X] Drop `layout`
-- [X] Drop `title` (but add it to content)
-- [X] Drop `tagline` (but add it to content)
-- [X] Add `date` based on the prev file name
-- [X] Add `from` based on the url scheme of my blog
-
 
 ## Markdown content
 
-Transformations to file content:
-- [X] Add title in the first line
-- [X] Add tagline after the first line
-- [X] Rewrite image urls
+- Rewrite image URLs

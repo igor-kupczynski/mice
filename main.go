@@ -63,18 +63,22 @@ func ReadContentFromDir(path string) ([]*ContentFile, error) {
 			Title:      title,
 			DatePrefix: datePrefix,
 			Extension:  ext,
+			Name:       filepath.Base(path),
 			Content:    buf,
 
 			Post: nil,
 		}
 		contents = append(contents, content)
 
-		if content.Extension != "md" {
+		if content.Extension != "md" && content.Extension != "html" {
 			return nil
 		}
 
 		// post specific transformations
 		post, err := processPost(content.Title, content.DatePrefix, content.Content)
+		if err != nil {
+			return err
+		}
 		content.Post = post
 		return nil
 	})
@@ -98,10 +102,8 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 	// rewrite image paths
 	restStr := string(rest)
 	for _, img := range imagePathRegexp.FindAllString(restStr, -1) {
-		imgFname := img[len(imageDir)+1:]
-		_, title, ext := splitFname(imgFname)
-		newPath := title + "." + ext
-		rest = bytes.Replace(rest, []byte(img), []byte(newPath), -1)
+		imgFname := "/assets/" + img[len(imageDir)+1:]
+		rest = bytes.Replace(rest, []byte(img), []byte(imgFname), -1)
 	}
 
 	buf := make([]byte, 0)
@@ -111,12 +113,10 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 	toMatter := &struct {
 		Layout       string   `yaml:"layout"`
 		Tags         []string `yaml:"tags"`
-		Date         string   `yaml:"date"`
 		RedirectFrom []string `yaml:"redirect_from"`
 	}{
 		Layout:       "post",
 		Tags:         fromMatter.Tags,
-		Date:         created,
 		RedirectFrom: []string{from},
 	}
 	matterBuf, err := yaml.Marshal(toMatter)
@@ -172,15 +172,18 @@ func SaveContentToDir(path string, cts []*ContentFile) error {
 		return err
 	}
 	for _, ct := range cts {
-		// try creating the year directory, ignore errors because the directory might have been date already
-		yearDir := filepath.Join(path, ct.Year())
-		_ = os.Mkdir(yearDir, 0755)
-
-		ctPath := filepath.Join(yearDir, ct.NewFname())
+		parent := "assets"
 		content := ct.Content
+
 		if ct.Post != nil {
 			content = ct.Post.Content
+			parent = "_posts"
 		}
+
+		root := filepath.Join(path, parent)
+		_ = os.Mkdir(root, 0755)
+
+		ctPath := filepath.Join(root, ct.Name)
 		if err := os.WriteFile(ctPath, content, 0644); err != nil {
 			return err
 		}
@@ -193,6 +196,7 @@ type ContentFile struct {
 	Title      string
 	DatePrefix string
 	Extension  string
+	Name       string
 	Content    []byte
 	Post       *Post
 }
@@ -200,10 +204,6 @@ type ContentFile struct {
 // Year returns the year when this ContentFile was date
 func (c *ContentFile) Year() string {
 	return c.DatePrefix[:4]
-}
-
-func (c *ContentFile) NewFname() string {
-	return fmt.Sprintf("%s.%s", c.Title, c.Extension)
 }
 
 // Post represents the extra fields for the layout: _post content

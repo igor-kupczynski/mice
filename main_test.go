@@ -71,7 +71,6 @@ layout: post
 tags:
 - privatelink
 - network
-date: "2022-01-30"
 redirect_from:
 - 2022/01/30/private-link.html
 ---
@@ -109,23 +108,22 @@ title: "Private Link is the IP filtering of the cloud"
 				Content: []byte(`---
 layout: post
 tags: []
-date: "2022-01-30"
 redirect_from:
 - 2022/01/30/private-link.html
 ---
 # Private Link is the IP filtering of the cloud
 
 <center style="float: right; display: block; margin: 10px;">
-	<img alt='Basic Personal Kanban' src='pk-book.png' />
+	<img alt='Basic Personal Kanban' src='/assets/2013-08-29-pk-book.png' />
 	<br/>
 	<em>Img 1.</em> Personal Kanban Book
 </center>
 
-![Gospodarka, Głupcze](gospodarka.jpg)
+![Gospodarka, Głupcze](/assets/2018-04-gospodarka.jpg)
 
-![Spacemacs](spacemacs.png)
+![Spacemacs](/assets/2018-04-spacemacs.png)
 
-![Private Link](private-link-basic.png)
+![Private Link](/assets/2022-01-private-link-basic.png)
 `),
 			},
 		},
