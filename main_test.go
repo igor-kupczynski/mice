@@ -67,6 +67,7 @@ foo
 			},
 			want: &Post{
 				Content: []byte(`---
+layout: post
 tags:
 - privatelink
 - network

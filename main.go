@@ -100,10 +100,12 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 	from := fmt.Sprintf("%s/%s.html", strings.ReplaceAll(created, "-", "/"), fname)
 
 	toMatter := &struct {
+		Layout       string   `yaml:"layout"`
 		Tags         []string `yaml:"tags"`
 		Date         string   `yaml:"date"`
 		RedirectFrom []string `yaml:"redirect_from"`
 	}{
+		Layout:       "post",
 		Tags:         fromMatter.Tags,
 		Date:         created,
 		RedirectFrom: []string{from},
