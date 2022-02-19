@@ -83,6 +83,52 @@ foo
 `),
 			},
 		},
+		{
+			name: "Should rewrite image locations",
+			args: args{
+				fname: "private-link",
+				date:  "2022-01-30",
+				content: []byte(`---
+layout: post
+title: "Private Link is the IP filtering of the cloud"
+---
+<center style="float: right; display: block; margin: 10px;">
+	<img alt='Basic Personal Kanban' src='/static/img/posts/2013-08-29-pk-book.png' />
+	<br/>
+	<em>Img 1.</em> Personal Kanban Book
+</center>
+
+![Gospodarka, Głupcze](/static/img/posts/2018-04-gospodarka.jpg)
+
+![Spacemacs](/static/img/posts/2018-04-spacemacs.png)
+
+![Private Link](/static/img/posts/2022-01-private-link-basic.png)
+`),
+			},
+			want: &Post{
+				Content: []byte(`---
+layout: post
+tags: []
+date: "2022-01-30"
+redirect_from:
+- 2022/01/30/private-link.html
+---
+# Private Link is the IP filtering of the cloud
+
+<center style="float: right; display: block; margin: 10px;">
+	<img alt='Basic Personal Kanban' src='pk-book.png' />
+	<br/>
+	<em>Img 1.</em> Personal Kanban Book
+</center>
+
+![Gospodarka, Głupcze](gospodarka.jpg)
+
+![Spacemacs](spacemacs.png)
+
+![Private Link](private-link-basic.png)
+`),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

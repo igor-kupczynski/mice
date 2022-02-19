@@ -86,9 +86,4 @@ Transformations to front matter
 Transformations to file content:
 - [X] Add title in the first line
 - [X] Add tagline after the first line
-- [ ] Rewrite image urls
-
-
-## Validation
-- [ ] Eyeball top 10 pages
-- [ ] Compare jekyll output to `from` property in the front matter
+- [X] Rewrite image urls

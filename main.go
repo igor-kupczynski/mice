@@ -95,6 +95,15 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 		return nil, err
 	}
 
+	// rewrite image paths
+	restStr := string(rest)
+	for _, img := range imagePathRegexp.FindAllString(restStr, -1) {
+		imgFname := img[len(imageDir)+1:]
+		_, title, ext := splitFname(imgFname)
+		newPath := title + "." + ext
+		rest = bytes.Replace(rest, []byte(img), []byte(newPath), -1)
+	}
+
 	buf := make([]byte, 0)
 
 	from := fmt.Sprintf("%s/%s.html", strings.ReplaceAll(created, "-", "/"), fname)
@@ -121,11 +130,11 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 	buf = append(buf, []byte(fmt.Sprintf("---\n"))...)
 
 	// add title
-	buf = append(buf, []byte(fmt.Sprintf("# %s\n", fromMatter.Title))...)
+	buf = append(buf, []byte(fmt.Sprintf("# %s\n\n", fromMatter.Title))...)
 
 	if fromMatter.Tagline != "" {
 		// add tagline
-		buf = append(buf, []byte(fmt.Sprintf("\n%s\n", fromMatter.Tagline))...)
+		buf = append(buf, []byte(fmt.Sprintf("%s\n", fromMatter.Tagline))...)
 	}
 
 	buf = append(buf, rest...)
@@ -137,6 +146,10 @@ func processPost(fname string, created string, content []byte) (*Post, error) {
 }
 
 var fnameRegexp = regexp.MustCompile(`^([0-9]{4}-[0-9]{2}(-[0-9]{2})?)-([0-9A-z-]+)`)
+
+const imageDir = `/static/img/posts`
+
+var imagePathRegexp = regexp.MustCompile(imageDir + `/[0-9A-z-]+\.(jpg|png|dot)`)
 
 func splitFname(fname string) (datePrefix string, title string, ext string) {
 	ext = filepath.Ext(fname)[1:]
